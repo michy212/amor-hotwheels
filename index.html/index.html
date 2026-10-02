@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Heart Particle Effect</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    overflow:hidden;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const particles = [];
+const totalParticles = 2500;
+
+let formHeart = false;
+
+function heart(t){
+    return{
+        x:16*Math.pow(Math.sin(t),3),
+        y:-(13*Math.cos(t)
+        -5*Math.cos(2*t)
+        -2*Math.cos(3*t)
+        -Math.cos(4*t))
+    };
+}
+
+class Particle{
+
+    constructor(){
+
+        this.angle = Math.random()*Math.PI*2;
+        this.radius = Math.random()*350+50;
+
+        this.x = canvas.width/2;
+        this.y = canvas.height/2;
+
+        this.size = Math.random()*2+1;
+
+        const t = Math.random()*Math.PI*2;
+        const p = heart(t);
+
+        this.tx = p.x*18;
+        this.ty = p.y*18;
+
+        this.offset = Math.random()*100;
+    }
+
+    update(time){
+
+        if(!formHeart){
+
+            this.angle += 0.01;
+
+            this.x =
+            canvas.width/2 +
+            Math.cos(this.angle)*this.radius;
+
+            this.y =
+            canvas.height/2 +
+            Math.sin(this.angle)*this.radius;
+
+        }else{
+
+            let pulse =
+            1 + Math.sin(time*1 + this.offset)*0.08;
+
+            let targetX =
+            canvas.width/2 +
+            this.tx*pulse;
+
+            let targetY =
+            canvas.height/2 +
+            this.ty*pulse;
+
+            this.x += (targetX-this.x)*0.04;
+            this.y += (targetY-this.y)*0.04;
+        }
+    }
+
+    draw(){
+
+        ctx.beginPath();
+        ctx.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle="#00cfff";
+        ctx.shadowColor="#00cfff";
+        ctx.shadowBlur=20;
+
+        ctx.fill();
+    }
+
+}
+
+for(let i=0;i<totalParticles;i++){
+    particles.push(new Particle());
+}
+
+setTimeout(()=>{
+    formHeart=true;
+},5000);
+
+function animate(){
+
+    ctx.fillStyle="rgba(0,0,0,0.5)";
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    let time = Date.now()/1000;
+
+    particles.forEach(p=>{
+        p.update(time);
+        p.draw();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+function crearCorazon(){
+
+    const heart =
+    document.createElement("div");
+
+    heart.innerHTML = "💙";
+
+    heart.style.position = "fixed";
+
+    heart.style.left =
+    Math.random()*100 + "vw";
+
+    heart.style.bottom = "-30px";
+
+    heart.style.fontSize =
+    (Math.random()*20+15)+"px";
+
+    heart.style.animation =
+    "subirCorazon 8s linear forwards";
+
+    heart.style.opacity =
+    Math.random()*0.8+0.2;
+
+    document.body.appendChild(heart);
+
+    setTimeout(()=>{
+        heart.remove();
+    },8000);
+}
+
+setInterval(crearCorazon,300);
+
+</script>
+
+</body>
+
+<div id="mensaje">Te amo 💙</div>
+<div id="hearts"></div>
+
+<script>
+
+// TODO TU CODIGO ACTUAL
+
+let musica = new Audio("Star music.mp3");
+
+document
+.getElementById("mensaje")
+.addEventListener("click",()=>{
+
+    musica.loop = true;
+    musica.volume = 0.3;
+    musica.play();
+
+    document.getElementById("mensaje").style.display="none";
+    document.querySelector("canvas").style.display="none";
+
+    mostrarRamo();
+});
+
+function mostrarRamo(){
+document.body.innerHTML = `
+<style>
+
+    #frase{
+    position:fixed;
+    top:30px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#00cfff;
+    font-size:45px;
+    font-family: "Times New Roman", serif;
+    text-align:center;
+    z-index:999;
+    text-shadow:
+        0 0 10px #00cfff,
+        0 0 20px #00cfff,
+        0 0 40px #00cfff,
+        0 0 80px #00cfff;
+}
+
+#carta{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:3000;
+    display:none;
+}
+
+#entradaNota,
+#notaImagen{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%) scale(0);
+    opacity:0;
+}
+
+#entradaNota{
+    width:220px;
+}
+
+#notaImagen{
+    width:320px;
+}
+
+.entradaAnimada{
+    animation:entradaCarta 1s ease forwards;
+}
+
+.notaAnimada{
+    animation:abrirNota 2s ease forwards;
+}
+
+@keyframes entradaCarta{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(0.2) rotate(-20deg);
+    }
+    70%{
+        transform:translate(-50%,-50%) scale(1.1) rotate(5deg);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+}
+
+@keyframes abrirNota{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-30%) scale(0.2);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+}
+    .cerrarNota{
+    animation:girarCerrar 1s ease forwards;
+}
+
+@keyframes girarCerrar{
+    0%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1) rotate(0deg);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(0) rotate(720deg);
+    }
+}
+
+body{
+    margin:0;
+    background-image:url("fondo campo.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+}
+.carro{
+    position:absolute;
+    width:100px;
+    right:-750px;
+    z-index:0;
+
+}
+
+@keyframes pasarRapido{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(calc(-200vw - 500px));
+    }
+}
+
+.carro1{
+    top:100%;
+    animation:pasarRapido 2s linear infinite;
+}
+
+.carro2{
+    top:10%;
+    animation:pasarRapido 2.5s linear infinite;
+    animation-delay:0.2s;
+}
+
+.carro3{
+    top:45%;
+    animation:pasarRapido 2s linear infinite;
+    animation-delay:0.4s;
+}
+
+.carro4{
+    top:55%;
+    animation:pasarRapido 2.5s linear infinite;
+    animation-delay:0.6s;
+}
+
+.carro5{
+    top:65%;
+    animation:pasarRapido 2s linear infinite;
+    animation-delay:0.8s;
+}
+
+.carro6{
+    top:75%;
+    animation:pasarRapido 2.5s linear infinite;
+    animation-delay:1s;
+}
+    .estrella{
+    position:absolute;
+    width:3px;
+    height:3px;
+    background:white;
+    border-radius:50%;
+    box-shadow:
+        0 0 5px white,
+        0 0 10px white,
+        0 0 15px #00cfff;
+    animation:parpadear 2s infinite;
+    z-index:-1;
+}
+
+@keyframes parpadear{
+    0%,100%{
+        opacity:0.2;
+        transform:scale(0.5);
+    }
+    50%{
+        opacity:1;
+        transform:scale(1.5);
+    }
+}
+
+#ramo{
+    width:300px;
+    height:auto;
+    margin-top:50px;
+    animation:aparecer 1s ease forwards;
+    filter:
+        drop-shadow(0 0 10px #00cfff)
+        drop-shadow(0 0 30px #00cfff);
+}
+
+@keyframes aparecer{
+    0%{
+        opacity:0;
+        transform:scale(0.6) rotate(-10deg);
+    }
+
+    70%{
+        transform:scale(1.1);
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1) rotate(0deg);
+    }
+}
+
+@keyframes crecer{
+    from{
+        opacity:0;
+        transform:scale(0);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+#contenedorRamo{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -60%);
+    width:300px;
+    height:300px;
+}
+    .flor{
+    position:absolute;
+    width:90px;
+
+    opacity:0;
+    transform:scale(0);
+
+    animation: crecer 0.8s ease forwards;
+    z-index:2;
+    cursor:pointer;
+transition:transform 0.3s;
+}
+
+.flor:hover{
+    transform:scale(1.1);
+}
+
+.flor1{
+    top:200px;
+    left:120px;
+    animation-delay:0.3s;
+}
+
+.flor2{
+    top:140px;
+    left:175px;
+    animation-delay:0.6s;
+}
+
+.flor3{
+    top:140px;
+    left:210px;
+    animation-delay:0.9s;
+}
+
+.flor4{
+    top:160px;
+    left:115px;
+    animation-delay:1.2s;
+}
+
+.flor5{
+    top:180px;
+    left:170px;
+    animation-delay:1.5s;
+}
+
+.flor6{
+    top:200px;
+    left:150px;
+    animation-delay:1.8s;
+}
+.flor7{
+    top:90px;
+    left:100px;
+    animation-delay:1.10s;
+}
+.flor8{
+    top:100px;
+    left:100px;
+    animation-delay:1.5s;
+}
+.flor9{
+top:115px;
+left:145px;
+animation-delay:2.0s;
+
+}
+.flor10{
+top:150px;
+left:140px;
+animation-delay:2.2s;
+}
+
+.flor11{
+top:170px;
+left:190px;
+animation-delay:2.4s;
+}
+
+.flor12{
+top:175px;
+left:105px;
+animation-delay:2.6s;
+}
+.flor13{
+    top:95px;
+    left:140px;
+    animation-delay:2.8s;
+}
+
+.flor14{
+    top:120px;
+    left:30px;
+    animation-delay:3.0s;
+}
+
+.flor15{
+    top:160px;
+    left:50px;
+    animation-delay:3.2s;
+}
+
+.flor16{
+    top:185px;
+    left:40px;
+    animation-delay:3.4s;
+}
+
+.flor17{
+    top:160px;
+    left:20px;
+    animation-delay:3.6s;
+}
+
+.flor18{
+    top:135px;
+    left:30px;
+    animation-delay:3.8s;
+}
+#ramo{
+    position:relative;
+    z-index:1;
+}
+   #luna{
+    position:fixed;
+    top:-90px;
+    right:500px;
+    width:140px;
+    height:auto;
+    z-index:0;
+    border:none;
+    filter:
+        drop-shadow(0 0 5px #fff)
+        drop-shadow(0 0 10px #fff)
+        drop-shadow(0 0 20px #fff);
+        cursor:pointer;
+z-index:5000;
+}
+    
+</style>
+
+<h1 id="frase">
+ Feliz Día de los Carritos Hot Wheels 
+</h1>
+
+<div class="estrella" style="top:80px;left:200px;"></div>
+<div class="estrella" style="top:150px;left:500px;animation-delay:1s;"></div>
+<div class="estrella" style="top:200px;left:900px;animation-delay:2s;"></div>
+<div class="estrella" style="top:130px;left:1200px;animation-delay:0.5s;"></div>
+<div class="estrella" style="top:250px;left:1500px;animation-delay:1.5s;"></div>
+<div class="estrella" style="top:100px;left:1700px;animation-delay:3s;"></div>
+<div class="estrella"
+     style="top:120px;left:800px;width:6px;height:6px;animation-duration:1s;">
+</div>
+
+<div class="estrella"
+     style="top:250px;left:1300px;width:8px;height:8px;animation-duration:1.5s;">
+</div>
+
+<div id="nota">
+    Feliz Día de los Carritos Hot Wheels 💙
+</div>
+
+<div id="carta">
+    <img id="entradaNota" src="entrada de nota.png">
+    <img id="notaImagen" src="nota.png">
+</div>
+
+<div id="contenedorRamo">
+    <img id="ramo" src="ramo azul.png">
+
+    <img class="flor flor1" src="flores uno.png">
+    <img class="flor flor2" src="flores dos.png">
+    <img class="flor flor3" src="flores uno.png">
+    <img class="flor flor4" src="flores dos.png">
+    <img class="flor flor5" src="flores uno.png">
+    <img class="flor flor6" src="flores dos.png">
+    <img class="flor flor7" src="flores uno.png">
+    <img class="flor flor8" src="flores dos.png">
+    <img class="flor flor9" src="flores dos.png">
+    <img class="flor flor10" src="flores dos.png">
+    <img class="flor flor11" src="flores dos.png">
+    <img class="flor flor12" src="flores uno.png">
+    <img class="flor flor13" src="flores dos.png">
+    <img class="flor flor14" src="flores uno.png">
+    <img class="flor flor15" src="flores uno.png">
+    <img class="flor flor16" src="flores dos.png">
+    <img class="flor flor17" src="flores uno.png">
+    <img class="flor flor18" src="flores dos.png">
+
+    <img id="luna" src="luna.png">
+
+    <img class="carro carro1" src="carro uno.png">
+<img class="carro carro2" src="carro dos.png">
+<img class="carro carro3" src="carro tres.png">
+<img class="carro carro4" src="carro cuatro.png">
+<img class="carro carro5" src="carro cinco.png">
+<img class="carro carro6" src="carro seis.png">
+
+</div>
+`;
+
+setTimeout(() => {
+
+    const flores = document.querySelectorAll(".flor");
+
+    flores.forEach(flor => {
+
+        flor.addEventListener("click", () => {
+
+            const carta = document.getElementById("carta");
+            const entrada = document.getElementById("entradaNota");
+            const nota = document.getElementById("notaImagen");
+
+            if (carta.style.display === "block") {
+
+                carta.style.display = "none";
+                entrada.style.opacity = "0";
+                nota.style.opacity = "0";
+
+                entrada.classList.remove("entradaAnimada");
+                nota.classList.remove("notaAnimada");
+
+                return;
+            }
+
+            carta.style.display = "block";
+            entrada.style.opacity = "1";
+
+            entrada.classList.remove("entradaAnimada");
+            nota.classList.remove("notaAnimada");
+
+            void entrada.offsetWidth;
+
+            entrada.classList.add("entradaAnimada");
+
+            setTimeout(() => {
+    entrada.style.opacity = "0";
+    nota.classList.add("notaAnimada");
+}, 1200);
+
+});
+
+});
+
+}, 100);
+const luna = document.getElementById("luna");
+
+luna.addEventListener("click", () => {
+
+    const carta = document.getElementById("carta");
+    const nota = document.getElementById("notaImagen");
+
+    nota.classList.add("cerrarNota");
+
+    setTimeout(() => {
+        carta.style.display = "none";
+        nota.classList.remove("cerrarNota");
+        nota.classList.remove("notaAnimada");
+        nota.style.opacity = "0";
+    }, 1000);
+
+});
+
+} // fin de mostrarRamo()
+
+</script>
+
+<style>
+#nota{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,30,0.9);
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    border:2px solid #00cfff;
+    font-size:24px;
+    text-align:center;
+    display:none;
+    z-index:2000;
+    box-shadow:
+        0 0 20px #00cfff,
+        0 0 40px #00cfff;
+}
+
+#mensaje{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+
+    font-family:'Great Vibes', cursive;
+
+    color:#1100ff;
+
+    font-size:70px;
+    letter-spacing: 12px;
+
+    text-shadow:
+        0 0 10px #008cff,
+        0 0 20px #008cff,
+        0 0 40px #008cff,
+        0 0 80px #008cff,
+        0 0 120px #008cff;
+
+    z-index:1000;
+    cursor:pointer;
+}
+#hearts{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    overflow:hidden;
+}
+
+@keyframes subirCorazon{
+
+    from{
+        transform:
+        translateY(0);
+
+        opacity:1;
+    }
+
+    to{
+        transform:
+        translateY(-110vh);
+
+        opacity:0;
+    }
+}
+
+</style>
+
+</body>
+</html>
